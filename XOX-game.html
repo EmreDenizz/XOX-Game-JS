@@ -1,0 +1,182 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="description" content="Play XOX">
+<meta name="author" content="Emre DENİZ">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<title>Play XOX Game</title>
+
+<style>
+input[type="submit"] {
+    background-color: #0033FF; border: solid #0033FF 1px; color: #ffffff; cursor: pointer;
+    font-size: 18px; font-weight: bold; height: 40px; margin-top: 25px;
+}
+input[type="submit"]:hover { opacity: 0.70; }
+.cell{ width:88px; height:120px; }
+.leftRight{ border-left:2px solid #0033FF; border-right:2px solid #0033FF; }
+.topBottom{ border-top:2px solid #0033FF; border-bottom:2px solid #0033FF; }
+table{ margin-top: 60px; border-spacing: 0; }
+table td{ padding-left: 32px; font-size: 75px; cursor: pointer; }
+.result{ font-size: 24px; font-weight: bold; color: red; display: none; }
+</style>
+</head>
+
+<body>
+<center>
+
+<input name="commit" value="RESTART" onclick="location.href=''" type="submit">
+
+<table>
+    <tr id="row1">
+		<td id="0" class="cell"></td>
+		<td id="1" class="cell leftRight"></td>
+		<td id="2"class="cell"></td>
+    </tr>
+	<tr id="row2">
+		<td id="3" class="cell topBottom"></td>
+		<td id="4" class="cell leftRight topBottom"></td>
+		<td id="5" class="cell topBottom"></td>
+    </tr>
+	<tr id="row3">
+		<td id="6" class="cell"></td>
+		<td id="7" class="cell leftRight"></td>
+		<td id="8" class="cell"></td>
+    </tr>
+</table>
+
+<p id="computerWin" class="result">COMPUTER WON!</p>
+<p id="playerWin" class="result">PLAYER WON!</p>
+<p id="draw" class="result">DRAW!</p>
+
+</center>
+</body>
+</html>
+
+<script>
+$(document).ready(function(){
+	
+	// return ocuurences of element in array
+	function getAllOccurences(element, array) {
+		var indexs = [], i = -1;
+		while ((i = array.indexOf(element, i+1)) != -1){
+			indexs.push(i);
+		}
+		return indexs;
+	}
+	
+	// if game ends, displays result message
+	function resultMessageControl(res){
+		if(res === 1){ $("#playerWin").show(); }
+		else if(res === -1){ $("#computerWin").show(); }
+		else if(res === 0){ $("#draw").show(); }
+	}
+	
+	Array.min = function(array){ return Math.min.apply(Math, array); };
+	
+	var depth = 7;
+	var board = ["", "", "", "", "", "", "", "", ""];
+	
+	// when user click on board
+	$("table").on("click", "td", function() {
+	
+		$(this).html("X");
+		board[this.id] = "X";
+		
+		var res = evaluateBoard(board);
+		resultMessageControl(res);
+		
+		// if game continues
+		if(res === ""){
+		
+			var minimaxValues = [];
+			var indexes = getAllOccurences("", board);
+			
+			// get minimax values
+			for(var i = 0; i < indexes.length; i++){
+				board[indexes[i]] = "O";
+				minimaxValues.push(minimax(board, depth, true));
+				board[indexes[i]] = "";
+			}
+			depth = depth - 2;
+			
+			// put "O" on board to best box
+			var minimum = Array.min(minimaxValues);
+			var index = indexes[minimaxValues.indexOf(minimum)];
+			board[index] = "O";
+			$("#"+index).html("O");
+			
+			resultMessageControl(evaluateBoard(board));
+			
+		}		
+		
+	});
+	
+	// calculate minimax values
+	function minimax(nodeInit, dep, maximizingPlayer){
+		
+		var node = [];
+		for(var u = 0; u < nodeInit.length; u++){
+			node[u] = nodeInit[u];
+		}
+		
+		var boardValue = evaluateBoard(node);
+		
+		// if depth=0 or node is terminal node
+		if(dep === 0 || boardValue !== ""){
+			return boardValue;
+		}
+		
+		// if maximizing player's turn("X")
+		if(maximizingPlayer){
+			bestValue = -2;
+			var indexes = getAllOccurences("", node);
+			for(var i = 0; i < indexes.length; i++){
+				node[indexes[i]] = "X";
+				v = minimax(node, dep-1, false);
+				bestValue = Math.max(bestValue, v);
+				node[indexes[i]] = "";
+			}
+			return bestValue;			
+		}
+		// if minimizing player's turn("O")
+		else{
+			bestValue = 2;
+			var indexes = getAllOccurences("", node);
+			for(var i = 0; i < indexes.length; i++){
+				node[indexes[i]] = "O";
+				v = minimax(node, dep-1, true);
+				bestValue = Math.min(bestValue, v);
+				node[indexes[i]] = "";
+			}
+			return bestValue;
+		}		
+	}
+	
+	// evaluate board to detect if game ends or not
+	// return 1, if the winner "X"
+	// return -1, if the winner "0"
+	// return 0, if draw
+	// return empty string, otherwise
+	function evaluateBoard(node){
+		if(node[0] === "X" && node[1] === "X" && node[2] === "X"){ return 1; }
+		else if(node[3] === "X" && node[4] === "X" && node[5] === "X"){ return 1; }
+		else if(node[6] === "X" && node[7] === "X" && node[8] === "X"){ return 1; }
+		else if(node[0] === "X" && node[3] === "X" && node[6] === "X"){ return 1; }
+		else if(node[1] === "X" && node[4] === "X" && node[7] === "X"){ return 1; }
+		else if(node[2] === "X" && node[5] === "X" && node[8] === "X"){ return 1; }
+		else if(node[0] === "X" && node[4] === "X" && node[8] === "X"){ return 1; }
+		else if(node[2] === "X" && node[4] === "X" && node[6] === "X"){ return 1; }
+		else if(node[0] === "O" && node[1] === "O" && node[2] === "O"){ return -1; }
+		else if(node[3] === "O" && node[4] === "O" && node[5] === "O"){ return -1; }
+		else if(node[6] === "O" && node[7] === "O" && node[8] === "O"){ return -1; }
+		else if(node[0] === "O" && node[3] === "O" && node[6] === "O"){ return -1; }
+		else if(node[1] === "O" && node[4] === "O" && node[7] === "O"){ return -1; }
+		else if(node[2] === "O" && node[5] === "O" && node[8] === "O"){ return -1; }
+		else if(node[0] === "O" && node[4] === "O" && node[8] === "O"){ return -1; }
+		else if(node[2] === "O" && node[4] === "O" && node[6] === "O"){ return -1; }
+		else if(node.indexOf("") === -1){ return 0; }
+		else { return "";}
+	}
+	
+});
+</script>
