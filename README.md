@@ -1,9 +1,9 @@
 # XOX-game
 
-### How to Play:
+### HOW TO PLAY:
 Open **XOX-game.html** file on any browser that runs JavaScript.
 
-### Screenshots:
+### SCREENSHOTS:
 <kbd><img src="Screenshots/1.png"/></kbd>
 <br/><br/>
 <kbd><img src="Screenshots/3.png"/></kbd>
