@@ -1,0 +1,37 @@
+input[type="submit"] {
+    background-color: #0033FF;
+    border: solid #0033FF 1px;
+    color: #ffffff; cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    height: 40px;
+    margin-top: 25px;
+}
+
+input[type="submit"]:hover{
+    opacity: 0.70;
+}
+
+.cell{
+    width:88px; height:120px;
+}
+
+.leftRight{
+    border-left:2px solid #0033FF; border-right:2px solid #0033FF;
+}
+
+.topBottom{
+    border-top:2px solid #0033FF; border-bottom:2px solid #0033FF;
+}
+
+table{
+    margin-top: 60px; border-spacing: 0;
+}
+
+table td{
+    padding-left: 32px; font-size: 75px; cursor: pointer;
+}
+
+.result{
+    font-size: 24px; font-weight: bold; color: red; display: none;
+}
